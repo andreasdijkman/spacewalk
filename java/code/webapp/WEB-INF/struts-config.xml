@@ -3683,6 +3683,23 @@
                  redirect="true"/>
     </action>
 
+    <action path="/systems/details/SystemModules"
+        scope="request"
+        input="/WEB-INF/pages/systems/sdc/modules.jsp"
+        type="com.redhat.rhn.frontend.action.systems.sdc.SystemModulesAction"
+        className="com.redhat.rhn.frontend.struts.RhnActionMapping"
+        name="submittedForm"
+	parameter="dispatch">
+        <set-property property="postRequiredIfSubmitted" value="true" />
+        <forward name="default"
+                 path="/WEB-INF/pages/systems/sdc/modules.jsp"/>
+	<forward name="confirm"
+                 path="/WEB-INF/pages/systems/sdc/confirm_modules.jsp"/>
+        <forward name="update"
+                 path="/systems/details/SystemModules.do"
+                 redirect="true"/>
+    </action>
+
     <action path="/systems/details/SoftwareCrashes"
         scope="request"
         input="/WEB-INF/pages/systems/crashes.jsp"
@@ -4604,6 +4621,24 @@
                  path="/WEB-INF/pages/channel/ssm/confirmnewbasechannels.jsp"/>
         <forward name="success" redirect="true"
                  path="/channel/ssm/BaseChannelSubscribe.do"/>
+    </action>
+
+    <!-- SSM/Modules -->
+    <action path="/ssm/modules/ModuleSubscriptions"
+            scope="request"
+            input="/WEB-INF/pages/ssm/modules/modules.jsp"
+            type="com.redhat.rhn.frontend.action.ssm.ModuleSubscriptionAction"
+            className="com.redhat.rhn.frontend.struts.RhnActionMapping"
+            name="submittedForm"
+	    parameter="dispatch">
+      <set-property property="postRequiredIfSubmitted" value="true" />
+      <forward name="default"
+               path="/WEB-INF/pages/ssm/modules/modules.jsp"/>
+      <forward name="confirm"
+               path="/WEB-INF/pages/ssm/modules/confirm_modules.jsp"/>
+      <forward name="update"
+               path="/ssm/modules/ModuleSubscriptions.do"
+               redirect="true"/>
     </action>
 
     <!-- SSM\Configuration -->

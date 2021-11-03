@@ -1223,6 +1223,23 @@ public class ActionManager extends BaseManager {
     }
 
     /**
+     * Return a new list of sids containing only sids for those servers that can run scripts
+     * @param sidsIn the list of sids
+     * @return the list of sids containing only servers that can run scripts
+     */
+    public static ArrayList<Long> removeServersWithoutScripting(List<Long> sidsIn) {
+        ArrayList<Long> sids = new ArrayList<Long>(sidsIn);
+        // Use Iterator to avoid concurrent modification issues
+        for (Iterator<Long> iter = sids.iterator(); iter.hasNext();) {
+            Long sid = iter.next();
+            if (!SystemManager.clientCapable(sid, "script.run")) {
+                iter.remove();
+            }
+        }
+        return sids;
+    }
+
+    /**
      * Checks that ScriptRunActions can be run on the servers with specified
      * IDs.
      * @param sids servers' ids

@@ -70,6 +70,10 @@
       <rhn-tab-url>/rhn/systems/details/SystemChannels.do</rhn-tab-url>
     </rhn-tab>
 
+    <rhn-tab name="Software Modules" acl="system_feature(ftr_package_updates)">
+      <rhn-tab-url>/rhn/systems/details/SystemModules.do</rhn-tab-url>
+    </rhn-tab>
+
     <rhn-tab name="Software Crashes" acl="system_has_management_entitlement()">
       <rhn-tab-url>/rhn/systems/details/SoftwareCrashes.do</rhn-tab-url>
       <rhn-tab-url>/rhn/systems/details/SoftwareCrashDetail.do</rhn-tab-url>

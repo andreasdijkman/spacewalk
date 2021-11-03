@@ -92,3 +92,5 @@ rhnOrgChannelFamilyPermissions   :: rhnPublicChannelFamily web_contact \
                                     rhnPrivateChannelFamily
 rhnServerNeededPackageCache      :: rhnErrata rhnPackage rhnPackageEVR rhnServerNeededCache \
                                     rhnServerModulesView
+rhnChanModSrvSubsView            :: rhnChannel rhnServerChannel rhnChannelPackage rhnPackage \
+                                    rhnErrataPackage rhnErrata rhnPackageEVR rhnServerModulesView

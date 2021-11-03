@@ -82,6 +82,17 @@
                     </div>
                 </div>
             </li>
+	    <li class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <rhn:icon type="header-channel" title="ssm.overview.modules" />
+                        <bean:message key="ssm.overview.modules"/>
+                    </div>
+                    <div class="col-sm-10">
+                        <bean:message key="ssm.overview.modules.subscriptions"/>
+                    </div>
+                </div>
+            </li>
         </rhn:require>
         <rhn:require acl="all_systems_in_set_have_feature(ftr_kickstart)">
             <li class="list-group-item">

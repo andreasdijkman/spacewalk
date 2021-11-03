@@ -35,6 +35,8 @@ import com.redhat.rhn.frontend.events.SsmChangeBaseChannelSubscriptionsAction;
 import com.redhat.rhn.frontend.events.SsmChangeBaseChannelSubscriptionsEvent;
 import com.redhat.rhn.frontend.events.SsmChangeChannelSubscriptionsAction;
 import com.redhat.rhn.frontend.events.SsmChangeChannelSubscriptionsEvent;
+import com.redhat.rhn.frontend.events.SsmChangeModuleSubscriptionAction;
+import com.redhat.rhn.frontend.events.SsmChangeModuleSubscriptionEvent;
 import com.redhat.rhn.frontend.events.SsmConfigFilesAction;
 import com.redhat.rhn.frontend.events.SsmConfigFilesEvent;
 import com.redhat.rhn.frontend.events.SsmDeleteServersAction;
@@ -280,6 +282,10 @@ public class MessageQueue {
 
         MessageQueue.registerAction(new SsmDeleteServersAction(),
                                     SsmDeleteServersEvent.class);
+
+        // Used to allow SSM module:stream subscription changes to run asynchronously
+        MessageQueue.registerAction(new SsmChangeModuleSubscriptionAction(),
+                                    SsmChangeModuleSubscriptionEvent.class);
 
         // Used to allow SSM package installs to be run asynchronously
         MessageQueue.registerAction(new SsmInstallPackagesAction(),

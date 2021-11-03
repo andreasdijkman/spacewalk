@@ -18,6 +18,7 @@ import java.net.IDN;
 import java.sql.Date;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,6 +51,8 @@ import com.redhat.rhn.common.security.PermissionException;
 import com.redhat.rhn.common.validator.ValidatorError;
 import com.redhat.rhn.common.validator.ValidatorResult;
 import com.redhat.rhn.common.validator.ValidatorWarning;
+import com.redhat.rhn.domain.action.script.ScriptActionDetails;
+import com.redhat.rhn.domain.action.script.ScriptRunAction;
 import com.redhat.rhn.domain.channel.Channel;
 import com.redhat.rhn.domain.channel.ChannelFamily;
 import com.redhat.rhn.domain.entitlement.Entitlement;
@@ -87,6 +90,8 @@ import com.redhat.rhn.frontend.dto.SystemOverview;
 import com.redhat.rhn.frontend.dto.SystemPendingEventDto;
 import com.redhat.rhn.frontend.dto.VirtualSystemOverview;
 import com.redhat.rhn.frontend.dto.kickstart.KickstartSessionDto;
+import com.redhat.rhn.frontend.dto.modulestream.ChannelModuleStreamDto;
+import com.redhat.rhn.frontend.dto.modulestream.ServerModuleStreamDto;
 import com.redhat.rhn.frontend.listview.PageControl;
 import com.redhat.rhn.frontend.xmlrpc.InvalidProxyVersionException;
 import com.redhat.rhn.frontend.xmlrpc.ProxySystemIsSatelliteException;
@@ -193,6 +198,50 @@ public class SystemManager extends BaseManager {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("sid", sid);
         return m.execute(params);
+    }
+
+    /**
+     * Gets the list of candidate modules:streams that this server is subscribed to,
+     * and to which it may subscribe.
+     * @param sid The id of the server in question
+     * @param uid The id of the user requesting
+     * @return Returns a list of candidate modules:streams and subscribed modules:streams
+     * for this server, along with the containing channels.
+     */
+    public static DataResult<ServerModuleStreamDto> systemModuleStreamSubscriptions(Long sid, Long uid) {
+        // We need the base channel to restrict the query to child channels
+        // It's cheaper to pass in the channel ID than infer it in the query
+        Long bcid = ServerFactory.lookupById(sid).getBaseChannel().getId();
+
+        SelectMode m = ModeFactory.getMode("System_queries",
+                "system_module_stream_subscriptions");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("sid", sid);
+        params.put("bcid", bcid);
+        params.put("uid", uid);
+        Map<String, Object> elabParams = new HashMap<String, Object>();
+        return makeDataResultNoPagination(params, elabParams, m, ServerModuleStreamDto.class);
+    }
+
+    /**
+     * Gets the list of candidate modules:streams that SSM servers are subscribed to,
+     * and to which they may subscribe.
+     * There is no restriction in servers that may be added to SSM, so base channels could be different.
+     * This condition isn't restricted here; it should be handled by business logic that processes these data.
+     * @param uid The id of the user requesting
+     * @return Returns a list of candidate modules:streams and subscribed modules:streams
+     * for these servers, along with the containing channels.
+     */
+    public static DataResult<ServerModuleStreamDto> ssmModuleStreamSubscriptions(Long uid) {
+        SelectMode m = ModeFactory.getMode("System_queries",
+                "ssm_module_stream_subscriptions");
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("uid", uid);
+        params.put("system_set_label", RhnSetDecl.SYSTEMS.getLabel());
+
+        Map<String, Object> elabParams = new HashMap<String, Object>();
+        return makeDataResultNoPagination(params, elabParams, m, ServerModuleStreamDto.class);
     }
 
     /**
@@ -1452,6 +1501,76 @@ public class SystemManager extends BaseManager {
         }
         HibernateFactory.getSession().refresh(server);
         return server;
+    }
+
+    /**
+     * Schedule a remote command event to run a bash script that (un)subscribes
+     * the server to the specified modules and streams.
+     * @param user The user requesting the change
+     * @param server The server
+     * @param unsubscribeList The list of modules to unsubscribe from
+     * @param subscribeList The list of module:streams to subscribe to
+     * @return scheduled {@link ScriptRunAction}
+     */
+    public static ScriptRunAction subscribeUnsubscribeServerToModulesStreams(User user, Server server,
+                                                                  List<ChannelModuleStreamDto> unsubscribeList,
+                                                                  List<ChannelModuleStreamDto> subscribeList) {
+        return subscribeUnsubscribeServersToModulesStreams(user, Arrays.asList(server.getId()),
+                                                           unsubscribeList, subscribeList);
+    }
+
+    /**
+     * Schedule a remote command event to run a bash script that (un)subscribes
+     * the listed servers to the specified modules and streams.
+     * @param user The user requesting the change
+     * @param sids The list of server sids on which to perform the change
+     * @param unsubscribeList The list of modules to unsubscribe from
+     * @param subscribeList The list of module:streams to subscribe to
+     * @return scheduled {@link ScriptRunAction}
+     */
+    public static ScriptRunAction subscribeUnsubscribeServersToModulesStreams(User user, List<Long> sids,
+                                                                   List<ChannelModuleStreamDto> unsubscribeList,
+                                                                   List<ChannelModuleStreamDto> subscribeList) {
+        java.util.Date schedDate = new java.util.Date();
+        final String scriptName = String.format("server_module_subs_change_sched_%s", schedDate);
+        final String dnfCmd = "dnf -y ";
+        String script = "#!/bin/sh\n";
+
+        // Generate the bash script dnf commands
+        for (ChannelModuleStreamDto cms : unsubscribeList) {
+            String line = String.format("%s module remove %s\n", dnfCmd, cms.getModule());
+            script += line;
+        }
+
+        for (ChannelModuleStreamDto cms : subscribeList) {
+            // We don't know if we're changing stream or installing for the first time
+            // Therefore we always reset the module first
+            String line = String.format("%s module reset %s\n", dnfCmd, cms.getModule());
+            script += line;
+            line = String.format("%s module install %s:%s\n", dnfCmd, cms.getModule(), cms.getStream());
+            script += line;
+        }
+
+        // Subscribe the servers to the channels owning the modules being installed before sending command
+        for (Long sid : sids) {
+            Server server = lookupByIdAndUser(sid, user);
+            Set<Channel> serverChannels = server.getChannels();
+            for (ChannelModuleStreamDto cms : subscribeList) {
+                Channel channel = ChannelManager.lookupByLabelAndUser(cms.getChannel(), user);
+                // Don't subscribe to existing channel subscriptions
+                // This is mostly to prevent subscribing to more than one base channel because it throws
+                // WrappedSQLException: ORA-20102: (channel_server_one_base)
+                if (!serverChannels.contains(channel)) {
+                    // Have to reassign server after changing channel subscription
+                    server = subscribeServerToChannel(user, server, channel);
+                }
+            }
+        }
+
+        // Schedule the remote command execution
+        // 600 is the default timeout used on the Web UI, so use it here
+        ScriptActionDetails sad = ActionManager.createScript("root", "root", 600L, script);
+        return ActionManager.scheduleScriptRun(user, sids, scriptName, sad, schedDate);
     }
 
     /**
