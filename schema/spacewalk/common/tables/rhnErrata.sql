@@ -70,10 +70,5 @@ CREATE INDEX rhn_errata_syn_index
     ON rhnErrata ( synopsis )
     TABLESPACE [[64k_tbs]];
 
-CREATE INDEX rhn_errata_advisory_type_id_idx
-    ON rhnErrata(advisory_type, id)
-    TABLESPACE [[64k_tbs]]
-    NOLOGGING;
-
 CREATE SEQUENCE rhn_errata_id_seq;
 

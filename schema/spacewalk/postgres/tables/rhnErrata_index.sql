@@ -1,4 +1,4 @@
--- oracle equivalent source sha1 aa0ee224ac3d5995e5677e0546ce364db4033546
+-- oracle equivalent source sha1 8ac74bb5f7e63f340a9b9e90950ad2a4dd8baf99
 --
 -- Copyright (c) 2017 Red Hat, Inc.
 --
@@ -29,3 +29,13 @@ CREATE UNIQUE INDEX rhn_errata_adv_uq
 CREATE UNIQUE INDEX rhn_errata_adv_org_uq
     ON rhnErrata (advisory, org_id)
  WHERE org_id IS NOT NULL;
+
+CREATE INDEX rhn_errata_adv_typ_id_idx
+    ON rhnErrata(advisory_type, id)
+ WHERE org-id IS NOT NULL;
+
+CREATE INDEX rhn_errata_syn_regex_idx
+    ON rhnErrata (substring(synopsis FROM '[^ ]+:[^ ]+'))
+ WHERE org-id IS NOT NULL;
+
+

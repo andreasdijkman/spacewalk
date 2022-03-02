@@ -20,3 +20,13 @@ CREATE UNIQUE INDEX rhn_errata_advname_org_uq
 CREATE UNIQUE INDEX rhn_errata_adv_org_uq
     ON rhnErrata (advisory, org_id)
     TABLESPACE [[64k_tbs]];
+
+CREATE INDEX rhn_errata_adv_typ_id_idx
+    ON rhnErrata(advisory_type, id)
+    TABLESPACE [[64k_tbs]]
+    NOLOGGING;
+
+CREATE INDEX rhn_errata_syn_regex_idx
+    ON rhnErrata (regexp_substr(synopsis,'[^ ]+:[^ ]+'))
+    TABLESPACE [[64k_tbs]]
+    NOLOGGING;

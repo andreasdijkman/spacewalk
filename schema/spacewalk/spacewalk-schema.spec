@@ -3,7 +3,7 @@
 Name:           spacewalk-schema
 Summary:        SQL schema for Spacewalk server
 
-Version:        2.10.12
+Version:        2.10.15
 Release:        2%{?dist}
 Source0:        %{name}-%{version}.tar.gz
 
@@ -93,6 +93,9 @@ install -m 755 schema-source-sanity-check.pl $RPM_BUILD_ROOT%{_bindir}/schema-so
 %attr(755,root,root) %{_bindir}/schema-source-sanity-check.pl
 
 %changelog
+* Wed Mar 02 2022 Laurence Rochfort <laurence.rocfort@oracle.com> 2.10.15-1
+- Add indexes for slow systems overview page [Orabug: 33914187]
+
 * Tue Apr 20 2021 Laurence Rochfort <laurence.rocfort@oracle.com> 2.10.12-1
 - Fix incorrect OL8 outdated package count on system overview page. [Orabug: 32648538]
 - Bump version to trigger schema upgrade

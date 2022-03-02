@@ -1,5 +1,6 @@
+-- oracle equivalent source sha1 9e7fe08812d64253ca243ceb7704efea7177a41c
 --
--- Copyright (C) 2021 Oracle and/or its affiliates. All rights reserved.
+-- Copyright (C) 2022 Oracle and/or its affiliates. All rights reserved.
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -17,17 +18,13 @@
 -- 02110-1301, USA.
 --
 
-CREATE INDEX rhn_channel_id_name_idx
-    ON rhnChannel(parent_channel, id, name)
-    TABLESPACE [[64k_tbs]]
-    NOLOGGING;
 
-CREATE INDEX rhn_errata_adv_typ_id_idx
-    ON rhnErrata(advisory_type, id);
-    TABLESPACE [[64k_tbs]]
-    NOLOGGING;
+DROP INDEX IF EXISTS rhn_errata_advisory_type_id_idx;
 
-CREATE INDEX rhn_snc_server_errata_id_idx
-    ON rhnServerNeededCache(server_id, errata_id)
-    TABLESPACE [[128m_tbs]]
-    NOLOGGING;
+CREATE INDEX IF NOT EXISTS rhn_errata_adv_typ_id_idx
+    ON rhnErrata(advisory_type, id)
+ WHERE org-id IS NOT NULL;
+
+CREATE INDEX rhn_errata_syn_regex_idx
+    ON rhnErrata (substring(synopsis FROM '[^ ]+:[^ ]+'))
+ WHERE org-id IS NOT NULL;
