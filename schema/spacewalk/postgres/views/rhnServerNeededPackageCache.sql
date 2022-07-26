@@ -1,4 +1,4 @@
--- oracle equivalent source sha1 5efd4e67015ef6baade873d150bf8d7af5345b14
+-- oracle equivalent source sha1 99752436b32b92b793bf841869b1dae816a5afa1
 --
 -- Copyright (C) 2020 Oracle and/or its affiliates. All rights reserved.
 --
@@ -37,8 +37,8 @@ LEFT OUTER JOIN rhnErrata E ON SNC.errata_id = E.id
 WHERE
 	SNC.package_id = P.id
 	AND P.evr_id = PE.id
-	AND ((lower(pe.release) NOT LIKE '%module+%')
-		OR (lower(pe.release) LIKE '%module+%'
+        AND ((pe.modular = 0)
+                OR (pe.modular = 1
 		        AND substring(E.synopsis FROM '[^ ]+:[^ ]+') IN (
 			SELECT
 				module_stream

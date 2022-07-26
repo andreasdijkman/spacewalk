@@ -1,4 +1,4 @@
--- oracle equivalent source sha1 15325d81fb440e7da2510f49a590401b87332df0
+-- oracle equivalent source sha1 ccd773f024255d52f3d84c9d3f89a2148dc5ae92
 --
 -- Copyright (c) 2008--2014 Red Hat, Inc.
 --
@@ -718,8 +718,8 @@ update pg_settings set setting = 'rhn_server,' || setting where name = 'search_p
                          (x.channel_id = sc.channel_id
                           AND x.package_id = cp.package_id)
                           AND
-                          ((lower(pe.release) NOT LIKE '%module+%')
-                           OR (lower(pe.release) LIKE '%module+%'
+                          ((pe.modular = 0)
+                           OR (pe.modular = 1
                            AND substring(x.synopsis FROM '[^ ]+:[^ ]+') IN (select module_stream
                                                                             from rhnservermodulesview
                                                                             where server_id = server_id_in)))

@@ -21,7 +21,8 @@ CREATE TABLE rhnPackageEVR
     epoch    VARCHAR2(16),
     version  VARCHAR2(512) NOT NULL,
     release  VARCHAR2(512) NOT NULL,
-    evr      EVR_T NOT NULL
+    evr      EVR_T NOT NULL,
+    modular  NUMBER DEFAULT 0 NOT NULL
 )
 ENABLE ROW MOVEMENT
 ;

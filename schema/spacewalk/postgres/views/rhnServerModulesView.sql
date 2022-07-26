@@ -1,4 +1,4 @@
--- oracle equivalent source sha1 650569309d0775f6c0ad97f23389a0bf8942530d
+-- oracle equivalent source sha1 1c55b936b718e368b8cb78b2b3d9a458865d5f11
 --
 -- Copyright (C) 2020 Oracle and/or its affiliates. All rights reserved.
 --
@@ -28,5 +28,5 @@ CREATE OR REPLACE VIEW RHNSERVERMODULESVIEW (SERVER_ID, MODULE_STREAM) AS
      JOIN rhnErrataPackage  ep ON p.id = ep.package_id
      JOIN rhnErrata         e ON ep.errata_id = e.id
 WHERE
-      lower(pe.release) LIKE '%module+%'
+      pe.modular = 1
       AND substring(e.synopsis FROM '[^ ]+:[^ ]+') IS NOT NULL;

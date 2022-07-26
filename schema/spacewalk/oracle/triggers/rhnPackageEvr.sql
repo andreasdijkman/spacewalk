@@ -29,4 +29,14 @@ begin
 	raise_application_error(-20050, 'Permission denied: ' || operation || ' is not allowed on RHNPACKAGEEVR');
 end;
 /
+
+CREATE OR REPLACE TRIGGER rhnPevrSetModularTrig
+BEFORE INSERT ON rhnPackageEvr
+FOR EACH ROW 
+WHEN (LOWER(NEW.release) LIKE '%module+%') 
+BEGIN
+  -- modular column is default 0
+  :NEW.modular := 1;
+END;
+/
 show errors

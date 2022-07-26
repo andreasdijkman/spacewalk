@@ -42,8 +42,8 @@ SELECT DISTINCT SNC.server_id,
    WHERE SNC.package_id = P.id
      AND P.name_id = PN.id
      AND P.evr_id = PE.id
-     AND ((lower(pe.release) NOT LIKE '%module+%')
-             OR (lower(pe.release) LIKE '%module+%'
+     AND ((pe.modular = 0)
+             OR (pe.modular = 1
              AND regexp_substr(E.synopsis, '[^ ]+:[^ ]+') in (select module_stream
                                                               from rhnservermodulesview
                                                               where server_id = SNC.server_id)));

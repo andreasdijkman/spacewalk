@@ -16,3 +16,7 @@
 CREATE UNIQUE INDEX rhn_pe_v_r_e_uq
     ON rhnPackageEVR (version, release, epoch)
     TABLESPACE [[2m_tbs]];
+
+CREATE BITMAP INDEX rhn_pe_mod_bmp
+    ON rhnPackageEVR (modular)
+    TABLESPACE [[2m_tbs]];

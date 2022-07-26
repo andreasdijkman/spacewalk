@@ -1,4 +1,4 @@
--- oracle equivalent source sha1 7b60dd7501131676cd156e497428fa888168bd15
+-- oracle equivalent source sha1 53ee5218347f61d47ce80d94811c579bab4ab5b3
 --
 -- Copyright (c) 2008--2015 Red Hat, Inc.
 --
@@ -43,8 +43,8 @@ SELECT DISTINCT SNC.server_id,
    WHERE SNC.package_id = P.id
      AND P.name_id = PN.id
      AND P.evr_id = PE.id
-     AND ((lower(pe.release) NOT LIKE '%module+%')
-             OR (lower(pe.release) LIKE '%module+%'
+     AND ((pe.modular = 0)
+             OR (pe.modular = 1
              AND substring(e.synopsis FROM '[^ ]+:[^ ]+') IN (select module_stream
                                                               from rhnservermodulesview
                                                               where server_id = SNC.server_id)));

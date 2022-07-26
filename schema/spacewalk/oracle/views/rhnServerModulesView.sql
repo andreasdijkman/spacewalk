@@ -27,5 +27,5 @@ CREATE OR REPLACE VIEW RHNSERVERMODULESVIEW (SERVER_ID, MODULE_STREAM) AS
      JOIN rhnErrataPackage  ep ON p.id = ep.package_id
      JOIN rhnErrata         e ON ep.errata_id = e.id
 WHERE
-      lower(pe.release) LIKE '%module+%'
+      pe.modular = 1
       AND regexp_substr(e.synopsis,'[^ ]+:[^ ]+') IS NOT NULL;

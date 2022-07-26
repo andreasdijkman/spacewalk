@@ -3,7 +3,7 @@
 Name:           spacewalk-schema
 Summary:        SQL schema for Spacewalk server
 
-Version:        2.10.16
+Version:        2.10.18
 Release:        1%{?dist}
 Source0:        %{name}-%{version}.tar.gz
 
@@ -93,8 +93,13 @@ install -m 755 schema-source-sanity-check.pl $RPM_BUILD_ROOT%{_bindir}/schema-so
 %attr(755,root,root) %{_bindir}/schema-source-sanity-check.pl
 
 %changelog
+* Wed Sep 28 2022 Laurence Rochfort <laurence.rochfort@oracle.com> 2.10.18-1
+- Handle 2.10.15 - 2.10.18 upgrade edge case
 
-* Wed May 16 2022 Laurence Rochfort <laurence.rochfort@oracle.com> 2.10.16-1
+* Tue Aug 23 2022 Laurence Rochfort <laurence.rochfort@oracle.com> 2.10.17-1
+- Needed cache errata generation performance improvement
+
+* Mon May 16 2022 Laurence Rochfort <laurence.rochfort@oracle.com> 2.10.16-1
 - Add view needed to support module:stream installation [OLDIS-6915]
 
 * Wed Mar 02 2022 Laurence Rochfort <laurence.rocfort@oracle.com> 2.10.15-1

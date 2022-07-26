@@ -92,7 +92,7 @@ sub check_file_content {
                 if (not $content =~ /^(--.*\n
                                         |\s*\n
                                         |(create|alter|comment\s+on)\s+table\s+$name\b(?:[^;]|';')+;
-                                        |create\s+(unique\s+)?index\s+\w+\s+on\s+$name[^;]+;
+                                        |create\s+(unique\s+|bitmap\s+)?index\s+\w+\s+on\s+$name[^;]+;
                                         |create\s+sequence[^;]+;
                                         |comment\s+on\s+column\s+$name\.[^;]+;
                                         )+$/ix) {
@@ -156,7 +156,7 @@ sub check_file_content {
         }
 }
 
-for my $c (sort keys %{ $files{common} }) {
+for my $c (sort keys %{ $files{ncommon} }) {
         next unless $c =~ /\.(sql|pks|pkb)$/;
         check_file_content($files{common}{$c});
         for my $o (qw( oracle postgres )) {

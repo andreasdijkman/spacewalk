@@ -1,20 +1,141 @@
+-- Copyright (C) 2022 Oracle and/or its affiliates.
 --
--- Copyright (c) 2008--2014 Red Hat, Inc.
---
--- This software is licensed to you under the GNU General Public License,
--- version 2 (GPLv2). There is NO WARRANTY for this software, express or
--- implied, including the implied warranties of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE. You should have received a copy of GPLv2
--- along with this software; if not, see
--- http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
--- 
--- Red Hat trademarks are not licensed under GPLv2. No permission is
--- granted to use or replicate Red Hat trademarks that are incorporated
--- in this software or its documentation. 
+-- This program is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License
+-- as published by the Free Software Foundation, version 2
 --
 --
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
 --
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+-- 02110-1301, USA.
 --
+
+ALTER TABLE RHNPACKAGEEVR 
+ADD (MODULAR NUMBER DEFAULT 0 NOT NULL);
+
+
+
+alter trigger RHN_PACK_EVR_NO_UPDEL_TRIG disable;
+
+update rhnpackageevr
+set modular = 1
+where lower(release) LIKE '%module+%';
+
+commit;
+
+alter trigger RHN_PACK_EVR_NO_UPDEL_TRIG enable;
+
+
+
+CREATE BITMAP INDEX RHN_PE_MOD_BMP ON RHNPACKAGEEVR (MODULAR);
+
+
+
+CREATE OR REPLACE TRIGGER RHN_PEVR_SET_MODULAR_TRIG 
+BEFORE INSERT ON RHNPACKAGEEVR 
+FOR EACH ROW 
+WHEN (LOWER(NEW.release) LIKE '%module+%') 
+BEGIN
+  -- modular column is default 0
+  :NEW.modular := 1;
+END;
+/
+SHOW ERRORS
+
+
+
+CREATE OR REPLACE VIEW RHNSERVERMODULESVIEW (SERVER_ID, MODULE_STREAM) AS
+ SELECT DISTINCT
+   sp.server_id,
+   regexp_substr(e.synopsis,'[^ ]+:[^ ]+') AS module_stream
+ FROM
+     rhnServerPackage sp
+     JOIN rhnPackageEvr     pe ON sp.evr_id = pe.id
+     JOIN rhnPackage        p ON pe.id = p.evr_id
+     JOIN rhnErrataPackage  ep ON p.id = ep.package_id
+     JOIN rhnErrata         e ON ep.errata_id = e.id
+WHERE
+      pe.modular = 1
+      AND regexp_substr(e.synopsis,'[^ ]+:[^ ]+') IS NOT NULL;
+
+
+
+CREATE OR REPLACE VIEW
+rhnServerNeededPackageCache
+(
+    server_id,
+    package_id,
+    errata_id
+)
+AS
+SELECT
+	SNC.server_id,
+	SNC.package_id,
+	max(SNC.errata_id) AS errata_id
+FROM
+	rhnPackageEVR PE,
+	rhnPackage P,
+	rhnServerNeededCache SNC
+LEFT OUTER JOIN rhnErrata E ON SNC.errata_id = E.id
+WHERE
+	SNC.package_id = P.id
+	AND P.evr_id = PE.id
+	AND ((pe.modular = 0)
+		OR (pe.modular = 1
+			AND regexp_substr(E.synopsis, '[^ ]+:[^ ]+') IN (
+			SELECT
+				module_stream
+			FROM
+				rhnservermodulesview
+			WHERE
+				server_id = SNC.server_id)))
+GROUP BY
+	snc.server_id,
+	snc.package_id;
+
+
+CREATE OR REPLACE VIEW
+rhnServerOutdatedPackages
+(
+    server_id,
+    package_name_id,
+    package_evr_id,    
+    package_arch_id,
+    package_nvre,
+    errata_id,
+    errata_advisory
+)
+AS
+SELECT DISTINCT SNC.server_id,
+         P.name_id,
+         P.evr_id,
+         P.package_arch_id,
+         PN.name || '-' || evr_t_as_vre_simple( PE.evr ),
+         E.id,
+         E.advisory
+    FROM rhnPackageName PN,
+         rhnPackageEVR PE,
+         rhnPackage P,
+         rhnServerNeededCache SNC
+           left outer join
+          rhnErrata E
+            on SNC.errata_id = E.id
+   WHERE SNC.package_id = P.id
+     AND P.name_id = PN.id
+     AND P.evr_id = PE.id
+     AND ((pe.modular = 0)
+             OR (pe.modular = 1
+             AND regexp_substr(E.synopsis, '[^ ]+:[^ ]+') in (select module_stream
+                                                              from rhnservermodulesview
+                                                              where server_id = SNC.server_id)));
+
+
 
 create or replace
 package body rhn_server

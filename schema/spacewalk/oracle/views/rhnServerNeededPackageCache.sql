@@ -36,8 +36,8 @@ LEFT OUTER JOIN rhnErrata E ON SNC.errata_id = E.id
 WHERE
 	SNC.package_id = P.id
 	AND P.evr_id = PE.id
-	AND ((lower(pe.release) NOT LIKE '%module+%')
-		OR (lower(pe.release) LIKE '%module+%'
+	AND ((pe.modular = 0)
+		OR (pe.modular = 1
 			AND regexp_substr(E.synopsis, '[^ ]+:[^ ]+') IN (
 			SELECT
 				module_stream
