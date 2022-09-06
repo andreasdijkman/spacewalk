@@ -44,6 +44,6 @@ sql:
    FROM  rhnUserActionOverview uao JOIN rhnServerAction SA
     ON uao.id = SA.action_id JOIN rhnServer S
     ON S.id = SA.server_id LEFT JOIN web_contact wc
-    ON uao.scheduler = wc.id)
-  X
+    ON uao.scheduler = wc.id) X
+  -- where placeholder
   ORDER BY id
