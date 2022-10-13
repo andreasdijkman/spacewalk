@@ -32,7 +32,7 @@ sql:
 
   SELECT * FROM (
   SELECT uao.id AS id,
-    uao.earliest_action AS earliest,
+    to_char(uao.earliest_action, 'YYYY-MM-DD HH24:MI:SS') AS earliest,
     uao.type_name,
     (CASE uao.action_name WHEN NULL THEN uao.type_name ELSE uao.action_name END) AS action_name,
     uao.scheduler,
