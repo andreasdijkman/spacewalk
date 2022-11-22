@@ -50,8 +50,18 @@ def xccdf_eval(server_id, action_id, data={}):
 def _process_testresult(tr, server_id, action_id, benchmark, profile, errors):
     start_time = None
     if tr.hasAttribute('start-time'):
-        start_time = tr.getAttribute('start-time')
+        # Remote timestamp indicator and trailing miliseconds
+        start_time = tr.getAttribute('start-time').replace('T', ' ')
+        # Don't use _truncate() because it appends elipsis
+        start_time = start_time[:19]
 
+    end_time = None
+    if tr.hasAttribute('end-time'):
+        # Remote timestamp indicator and trailing miliseconds
+        end_time = tr.getAttribute('end-time').replace('T', ' ')
+        # Don't use _truncate() because it appends elipsis
+        end_time = end_time[:19]
+        
     h = rhnSQL.prepare(_query_insert_tresult, blob_map={'errors': 'errors'})
     h.execute(server_id=server_id,
               action_id=action_id,
@@ -60,8 +70,8 @@ def _process_testresult(tr, server_id, action_id, benchmark, profile, errors):
               profile_id=profile.getAttribute('id'),
               profile_title=_truncate(profile.getAttribute('title'), 120),
               identifier=_truncate(tr.getAttribute('id'), 120),
-              start_time=start_time.replace('T', ' '),
-              end_time=tr.getAttribute('end-time').replace('T', ' '),
+              start_time=start_time,
+              end_time=end_time,
               errors=errors
               )
     h = rhnSQL.prepare(_query_get_tresult)
