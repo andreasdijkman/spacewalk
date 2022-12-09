@@ -638,8 +638,8 @@ class RepoSync(object):
         absdir = os.path.join(CFG.MOUNT_POINT, relativedir)
         if not os.path.exists(absdir):
             os.makedirs(absdir)
-        # Make modules dir group-writable so that Tomcat Java can copy modules files
-        if relative_dir == relative_modules_dir:
+        # Make modules or comps dir group-writable so that Tomcat Java can copy modules files
+        if relative_dir in {relative_comps_dir, relative_modules_dir}:
             absmoddir = os.path.join(CFG.MOUNT_POINT, relative_dir)
             st = os.stat(absmoddir)
             if not bool(st.st_mode & stat.S_IWGRP):

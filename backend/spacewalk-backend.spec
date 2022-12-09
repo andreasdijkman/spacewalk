@@ -433,10 +433,15 @@ if [ ! -e %{rhnconf}/rhn.conf ]; then
     exit 0
 fi
 
-# Makes modules metadata folder tree group-writable so that Tomcat/Java can copy modules.yaml
+
 sw_mount_root=$(awk '/kickstart_mount_point/ { print $3 }' %{rhnconf}/rhn.conf)
+# Make modules metadata folder tree group-writable so that Tomcat/Java can copy modules.yaml
 if [ -n "$sw_mount_root" ]; then
     chmod -R g+w "$sw_mount_root/rhn/modules"
+fi
+# Make comps folder tree group-writable so that Tomcat/Java can copy comps.xml
+if [ -n "$sw_mount_root" ]; then
+    chmod -R g+w "$sw_mount_root/rhn/comps"
 fi
 
 # Is secret key in our config file?

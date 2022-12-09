@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2020 Oracle and/or its affiliates.
+ * Copyright (C) 2022 Oracle and/or its affiliates.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,20 +20,20 @@
 package com.redhat.rhn.domain.channel;
 
 /**
- * Copying module.yaml file during channel clone failed.
+ * Copying metadata file during channel clone failed.
  * <p>
  */
-public class CopyModuleMetadataFileFailedException extends RuntimeException  {
+public class CopyMetadataFileFailedException extends RuntimeException  {
 
-        /**
+    /**
      * Constructor
      * @param message the reason copying failed
      */
-    public CopyModuleMetadataFileFailedException(String message) {
+    public CopyMetadataFileFailedException(String message) {
         super(message);
     }
 
-        /**
+    /**
      * Constructor
      * @param message the reason copying failed
      * @param cause the cause (which is saved for later retrieval
@@ -41,7 +41,7 @@ public class CopyModuleMetadataFileFailedException extends RuntimeException  {
      * permitted, and indicates that the cause is nonexistent or
      * unknown.)
      */
-    public CopyModuleMetadataFileFailedException(String message ,   Throwable cause) {
+    public CopyMetadataFileFailedException(String message, Throwable cause) {
         super(message, cause);
     }
 
