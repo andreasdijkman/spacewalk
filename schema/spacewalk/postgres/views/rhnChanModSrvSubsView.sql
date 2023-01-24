@@ -1,4 +1,4 @@
--- oracle equivalent source sha1 f9802a53723109d6b955589dd0e7c3364bc255e1
+-- oracle equivalent source sha1 ffb156151479073a0d895cb95efb58b7b13f6d55
 --
 -- Copyright (C) 2021 Oracle and/or its affiliates. All rights reserved.
 --
@@ -53,6 +53,6 @@ FROM
 	JOIN rhnPackageEvr pe ON p.evr_id = pe.id
 	LEFT OUTER JOIN rhnServerModulesView smv ON (substring(e.synopsis FROM '[^ ]+:[^ ]+') = smv.module_stream
                                                      AND sc.server_id = smv.server_id)
-WHERE lower(pe.release) LIKE '%module+%'
+WHERE pe.modular = 1
 AND substring(e.synopsis FROM '[^ ]+:[^ ]+') IS NOT NULL
 ORDER BY pc.label, c.label, channel_module_stream, sc.server_id;

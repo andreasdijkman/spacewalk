@@ -3,7 +3,7 @@
 Name:           spacewalk-schema
 Summary:        SQL schema for Spacewalk server
 
-Version:        2.10.18
+Version:        2.10.19
 Release:        1%{?dist}
 Source0:        %{name}-%{version}.tar.gz
 
@@ -93,6 +93,9 @@ install -m 755 schema-source-sanity-check.pl $RPM_BUILD_ROOT%{_bindir}/schema-so
 %attr(755,root,root) %{_bindir}/schema-source-sanity-check.pl
 
 %changelog
+* Tue Jan 24 2023 Laurence Rochfort <laurence.rochfort@oracle.com> 2.10.19-1
+- Improve modules calculations performance
+
 * Wed Sep 28 2022 Laurence Rochfort <laurence.rochfort@oracle.com> 2.10.18-1
 - Handle 2.10.15 - 2.10.18 upgrade edge case
 

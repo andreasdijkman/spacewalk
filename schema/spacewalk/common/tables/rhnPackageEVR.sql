@@ -30,5 +30,10 @@ ENABLE ROW MOVEMENT
 -- unique index definitions has been moved to
 -- {oracle,postgres}/tables/rhnPackageEVR_index.sql
 
+CREATE UNIQUE INDEX rhn_pe_mod_id
+    ON rhnPackageEvr(modular, id)
+    TABLESPACE [[64k_tbs]]
+    NOLOGGING;
+
 CREATE SEQUENCE rhn_pkg_evr_seq;
 

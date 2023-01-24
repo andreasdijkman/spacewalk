@@ -89,5 +89,10 @@ CREATE INDEX rhn_package_evr_id_idx
     TABLESPACE [[64k_tbs]]
     NOLOGGING;
 
+CREATE INDEX rhn_pkg_evr_pid_idx
+    ON rhnPackage (evr_id, id)
+    TABLESPACE [[64k_tbs]]
+    NOLOGGING;
+
 CREATE SEQUENCE rhn_package_id_seq;
 

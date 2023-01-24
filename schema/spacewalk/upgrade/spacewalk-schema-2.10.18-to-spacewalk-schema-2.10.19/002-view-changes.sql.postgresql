@@ -1,5 +1,5 @@
---
--- Copyright (C) 2021 Oracle and/or its affiliates. All rights reserved.
+-- oracle equivalent source sha1 908039eff7af663fce1e9b5dc0a32b5d608aecdd
+-- Copyright (C) 2023 Oracle and/or its affiliates.
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -16,6 +16,7 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 -- 02110-1301, USA.
 --
+
 CREATE OR REPLACE VIEW
 RHNCHANMODSRVSUBSVIEW
 (
@@ -37,7 +38,7 @@ SELECT DISTINCT
 	c.id AS channel_id,
         c.label AS channel_label,
         c.name AS channel_name,
-        regexp_substr(e.synopsis,'[^ ]+:[^ ]+') AS channel_module_stream,
+        substring(e.synopsis FROM '[^ ]+:[^ ]+') AS channel_module_stream,
         sc.server_id,
 	smv.module_stream as server_module_stream
 FROM
@@ -50,8 +51,8 @@ FROM
 	JOIN rhnErrataPackage ep ON p.id = ep.package_id
 	JOIN rhnErrata e ON ep.errata_id = e.id
 	JOIN rhnPackageEvr pe ON p.evr_id = pe.id
-	LEFT OUTER JOIN rhnServerModulesView smv ON (regexp_substr(e.synopsis,'[^ ]+:[^ ]+') = smv.module_stream
+	LEFT OUTER JOIN rhnServerModulesView smv ON (substring(e.synopsis FROM '[^ ]+:[^ ]+') = smv.module_stream
                                                      AND sc.server_id = smv.server_id)
 WHERE pe.modular = 1
-AND regexp_substr(e.synopsis,'[^ ]+:[^ ]+') IS NOT NULL
+AND substring(e.synopsis FROM '[^ ]+:[^ ]+') IS NOT NULL
 ORDER BY pc.label, c.label, channel_module_stream, sc.server_id;

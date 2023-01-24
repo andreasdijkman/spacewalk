@@ -1,4 +1,4 @@
--- oracle equivalent source sha1 da58729447ffdfef410e10523f99a83ce08096d7
+-- oracle equivalent source sha1 44e0b7be63a40d3a50e22288a229ef0def984d1b
 --
 -- Copyright (c) 2017 Red Hat, Inc.
 --
@@ -22,5 +22,3 @@ create unique index rhn_pe_v_r_uq
     on rhnpackageevr (version, release)
  where epoch is null;
 
-CREATE INDEX RHN_PE_MOD_BMP
-    ON RHNPACKAGEEVR (MODULAR);

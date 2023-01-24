@@ -33,8 +33,8 @@ TABLESPACE [[server_package_tablespace]]
 ENABLE ROW MOVEMENT
 ;
 
-CREATE UNIQUE INDEX rhn_sp_snep_uq
-    ON rhnServerPackage (server_id, name_id, evr_id, package_arch_id)
+CREATE UNIQUE INDEX rhn_sp_senp_uq
+    ON rhnServerPackage (server_id, evr_id, name_id, package_arch_id)
     TABLESPACE [[128m_tbs]]
     NOLOGGING;
 
