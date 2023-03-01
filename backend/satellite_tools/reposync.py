@@ -589,12 +589,12 @@ class RepoSync(object):
                 if d == 'modules' or root.startswith(rhn_path + "/modules"):
                     fileutils.setPermsPath(os.path.join(root, d), user='tomcat', group='apache', chmod=0o770)
                 else:
-                    fileutils.setPermsPath(os.path.join(root, d), group='apache')
+                    fileutils.setPermsPath(os.path.join(root, d), group='apache', chmod=0o770)
             for f in files:
                 if root.startswith(rhn_path + "/modules"):
                     fileutils.setPermsPath(os.path.join(root, f), user='tomcat', group='apache', chmod=0o770)
                 else:
-                    fileutils.setPermsPath(os.path.join(root, f), group='apache')
+                    fileutils.setPermsPath(os.path.join(root, f), group='apache', chmod=0o770)
         elapsed_time = datetime.now() - start_time
         log(0, "Sync of channel completed in %s." % str(elapsed_time).split('.')[0])
         # if there is no global problems, but some packages weren't synced
