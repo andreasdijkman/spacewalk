@@ -16,6 +16,7 @@ package com.redhat.rhn.common.db.datasource;
 
 import com.redhat.rhn.common.ObjectCreateWrapperException;
 import com.redhat.rhn.common.RhnRuntimeException;
+import com.redhat.rhn.common.conf.ConfigDefaults;
 import com.redhat.rhn.common.db.NamedPreparedStatement;
 import com.redhat.rhn.common.hibernate.HibernateFactory;
 import com.redhat.rhn.common.hibernate.HibernateHelper;
@@ -311,7 +312,18 @@ public class CachedStatement implements Serializable {
                 sb.append(String.valueOf(value));
             }
         }
-        return sb.toString();
+
+        String final_query = sb.toString();
+
+        if (ConfigDefaults.get().isPostgresql()) {
+            // Insert 'values (' at the start of the query
+            sb.insert(0,"values (");
+            // add extra ')' at the and
+            sb.append(") ");
+            // replace all ',' with '),('
+            final_query = sb.toString().replace(",","),(");
+        } 
+        return final_query;
     }
 
     Collection<Object> executeElaborator(List<Object> resultList, Mode mode,
