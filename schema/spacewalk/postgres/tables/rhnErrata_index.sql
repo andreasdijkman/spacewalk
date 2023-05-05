@@ -32,10 +32,10 @@ CREATE UNIQUE INDEX rhn_errata_adv_org_uq
 
 CREATE INDEX rhn_errata_adv_typ_id_idx
     ON rhnErrata(advisory_type, id)
- WHERE org-id IS NOT NULL;
+ WHERE org_id IS NOT NULL;
 
 CREATE INDEX rhn_errata_syn_regex_idx
     ON rhnErrata (substring(synopsis FROM '[^ ]+:[^ ]+'))
- WHERE org-id IS NOT NULL;
+ WHERE org_id IS NOT NULL;
 
 
