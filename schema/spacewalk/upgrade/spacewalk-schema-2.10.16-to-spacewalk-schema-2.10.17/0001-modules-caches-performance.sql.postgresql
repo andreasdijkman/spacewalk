@@ -18,10 +18,7 @@
 -- 02110-1301, USA.
 --
 
-ALTER TABLE RHNPACKAGEEVR 
-ADD (MODULAR NUMBER DEFAULT 0 NOT NULL);
-
-
+alter table rhnpackageevr add column modular int default 0 not null;
 
 alter table rhnpackageevr disable trigger RHN_PACK_EVR_NO_UPDEL_TRIG;
 
